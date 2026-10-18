@@ -1,6 +1,6 @@
-# RideAgent
+# Lexar AI
 
-RideAgent is a chat-first ride assistant demo. It compares registered providers, applies saved ride rules, asks for confirmation by default, and exposes a tracked ride flow. The first market is Delhi, India; the provider seams are country-neutral.
+Lexar AI is a chat-first ride assistant demo. It compares registered providers, applies saved ride rules, asks for confirmation by default, and exposes a tracked ride flow. The first market is Delhi, India; the provider seams are country-neutral.
 
 ## Build status
 
@@ -95,7 +95,7 @@ Those commands are not part of the current API startup path, and no migration ha
 
 1. Start the API and confirm `/health` returns `{"status":"ok"}`.
 2. Start the mobile preview. A fresh API store has no rules; the app seeds its safe default rules through `PUT /v1/rules`.
-3. Ask RideAgent, for example: `I need a ride to the airport`.
+3. Ask Lexar AI, for example: `I need a ride to the airport`.
 4. With the default `ask_before_booking` mode, inspect the recommendation and press **Confirm booking**. The API will not call a provider's booking operation before positive confirmation.
 5. In the active ride card, refresh tracking, share the trip, or cancel it. The Activity surface shows decisions and ride events.
 6. To exercise the human-handoff boundary, register only a `DeepLinkProvider` in an API test or injected registry. It returns a link and a `human_action_required` response; it is never reported as booked until a provider confirms a booking through an allowed adapter.

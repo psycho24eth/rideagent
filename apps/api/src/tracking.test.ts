@@ -47,7 +47,7 @@ async function bookRide(app: BuiltApp) {
   return response.json().ride as { id: string; providerRideId: string };
 }
 
-describe("RideAgent Phase 3 tracking", () => {
+describe("Lexar AI Phase 3 tracking", () => {
   let provider: TrackingProvider;
   let app: BuiltApp;
 

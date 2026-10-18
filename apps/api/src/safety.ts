@@ -18,7 +18,7 @@ export class SafetyService {
   requireRules(userId: string): DemoRules {
     const rules = this.store.getRules(userId);
     if (!rules || rules.perRideCapMinor < 0 || rules.dailySpendCapMinor < 0) {
-      throw new SafetyViolation("RULES_REQUIRED", "Set your RideAgent rules before requesting or booking a ride.");
+      throw new SafetyViolation("RULES_REQUIRED", "Set your Lexar AI rules before requesting or booking a ride.");
     }
     return rules;
   }

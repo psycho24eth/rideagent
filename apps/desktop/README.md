@@ -1,4 +1,4 @@
-# RideAgent desktop preview
+# Lexar AI desktop preview
 
 The browser-based desktop preview keeps the approved chat-only experience in one conversation. Rich route, traffic, quote, booking, and live-ride blocks are rendered inline; provider tool calls are intentionally not shown.
 

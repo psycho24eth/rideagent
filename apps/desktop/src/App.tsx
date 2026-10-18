@@ -207,7 +207,7 @@ function liveUpdateBlocks(telemetry: RideLiveTelemetry): AssistantBlock[] {
 
 function errorText(error: unknown) {
   if (error instanceof ApiError && error.status === 0) {
-    return `Cannot reach the RideAgent API at ${API_BASE_URL}. Demo mode is active.`;
+    return `Cannot reach the Lexar AI API at ${API_BASE_URL}. Demo mode is active.`;
   }
   return error instanceof Error ? error.message : "Something went wrong. Try again.";
 }
@@ -541,10 +541,10 @@ export default function App() {
         // Sharing a cached snapshot is still useful when the read endpoint is briefly unavailable.
       }
     }
-    const shareText = `RideAgent trip to ${ride.dropoff.label || ride.dropoff.address || "your destination"}. Status: ${statusText(ride.status)}. Driver: ${ride.driverId || "assigned"}. OTP: ${getOtp(ride.id)}.`;
+    const shareText = `Lexar AI trip to ${ride.dropoff.label || ride.dropoff.address || "your destination"}. Status: ${statusText(ride.status)}. Driver: ${ride.driverId || "assigned"}. OTP: ${getOtp(ride.id)}.`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "RideAgent trip", text: shareText });
+        await navigator.share({ title: "Lexar AI trip", text: shareText });
         showToast("Trip shared");
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareText);
@@ -576,7 +576,7 @@ export default function App() {
     <div className="app-shell">
       <Header mode={mode} onRules={() => { setDraftRules(rules); setSettingsOpen(true); }} />
       <main className="app-main">
-        <section className="conversation" aria-label="RideAgent conversation">
+        <section className="conversation" aria-label="Lexar AI conversation">
           <div className="conversation-head">
             <div>
               <p className="overline">TODAY · DELHI</p>
@@ -612,7 +612,7 @@ export default function App() {
         </section>
       </main>
       <div className="app-footer">
-        <span><span className="footer-dot" /> {mode === "live" ? "Connected to RideAgent API" : mode === "demo" ? "Demo mode · deterministic preview data" : "Connecting to RideAgent API"}</span>
+        <span><span className="footer-dot" /> {mode === "live" ? "Connected to Lexar AI API" : mode === "demo" ? "Demo mode · deterministic preview data" : "Connecting to Lexar AI API"}</span>
         <span>Raw provider operations stay hidden.</span>
       </div>
       {toast ? <div className="toast" role="status">{toast}</div> : null}
@@ -637,7 +637,7 @@ function Header({ mode, onRules }: { mode: ConnectionMode; onRules: () => void }
     <header className="app-header">
       <div className="brand-lockup">
         <div className="brand-mark" aria-hidden="true">✦</div>
-        <div><p className="brand-kicker">PERSONAL MOBILITY</p><p className="brand-name">RideAgent</p></div>
+        <div><p className="brand-kicker">PERSONAL MOBILITY</p><p className="brand-name">Lexar AI</p></div>
       </div>
       <div className="header-right">
         <div className={`mode-pill mode-${mode}`}><span className="mode-dot" /> {label}</div>
@@ -938,18 +938,18 @@ function QuickPrompts({ onPrompt }: { onPrompt: (value: string) => void }) {
 }
 
 function TypingIndicator() {
-  return <div className="typing-indicator"><span className="typing-dots"><i /><i /><i /></span><span>RideAgent is comparing options…</span></div>;
+  return <div className="typing-indicator"><span className="typing-dots"><i /><i /><i /></span><span>Lexar AI is comparing options…</span></div>;
 }
 
 function Composer({ value, loading, onChange, onSend }: { value: string; loading: boolean; onChange: (value: string) => void; onSend: () => void }) {
   return (
     <div className="composer-wrap">
       <div className="composer">
-        <textarea aria-label="Message RideAgent" value={value} onChange={(event) => onChange(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); onSend(); } }} placeholder="Ask for a ride…" rows={1} disabled={loading} />
+        <textarea aria-label="Message Lexar AI" value={value} onChange={(event) => onChange(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); onSend(); } }} placeholder="Ask for a ride…" rows={1} disabled={loading} />
         <span className="composer-hint">↵ send</span>
         <button className="send-button" type="button" aria-label="Send message" disabled={!value.trim() || loading} onClick={onSend}>↑</button>
       </div>
-      <p>RideAgent compares, recommends, and books within your saved rules.</p>
+      <p>Lexar AI compares, recommends, and books within your saved rules.</p>
     </div>
   );
 }
@@ -982,7 +982,7 @@ function SettingsPanel({
     <div className="settings-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <aside className="settings-panel" role="dialog" aria-modal="true" aria-label="Ride rules">
         <div className="settings-header"><div><p className="overline">PERSONALIZATION</p><h2>Ride rules</h2></div><button type="button" className="icon-button close-settings" aria-label="Close ride rules" onClick={onClose}>×</button></div>
-        <p className="settings-intro">RideAgent will explain itself before it acts. These controls stay local to this preview until saved.</p>
+        <p className="settings-intro">Lexar AI will explain itself before it acts. These controls stay local to this preview until saved.</p>
         {loading ? <div className="settings-loading">Loading your rules…</div> : <>
           <fieldset><legend>BOOKING MODE</legend><div className="segmented"><button type="button" className={draft.bookingMode === "ask_before_booking" ? "selected" : ""} onClick={() => set("bookingMode", "ask_before_booking")}>Ask before booking</button><button type="button" className={draft.bookingMode === "auto_book_within_rules" ? "selected" : ""} onClick={() => set("bookingMode", "auto_book_within_rules")}>Auto-book in rules</button></div></fieldset>
           <fieldset><legend>SPEND LIMITS</legend><div className="limit-grid"><label>Per-ride cap<div className="money-input"><span>₹</span><input inputMode="decimal" value={(draft.perRideCapMinor / 100).toFixed(2)} onChange={(event) => set("perRideCapMinor", Math.max(0, Math.round(Number(event.target.value.replace(/[^0-9.]/g, "")) * 100) || 0))} /></div></label><label>Daily cap<div className="money-input"><span>₹</span><input inputMode="decimal" value={(draft.dailySpendCapMinor / 100).toFixed(2)} onChange={(event) => set("dailySpendCapMinor", Math.max(0, Math.round(Number(event.target.value.replace(/[^0-9.]/g, "")) * 100) || 0))} /></div></label></div></fieldset>

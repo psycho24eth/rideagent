@@ -68,7 +68,7 @@ export async function runWorkerFromEnv(): Promise<Worker<TrackingJobPayload> | u
 
   const app = buildApp({ store });
   const worker = startWorker({ tracking: app.demo.tracking, store, redisUrl });
-  worker.on("error", (error) => console.error("RideAgent tracking worker error", error));
+  worker.on("error", (error) => console.error("Lexar AI tracking worker error", error));
 
   const shutdown = async () => {
     await worker.close();

@@ -1,6 +1,6 @@
-# RideAgent Mobile
+# Lexar AI Mobile
 
-Phase 4 chat-first Expo app for the RideAgent demo. The app is intentionally dependency-light and uses React Native primitives for the interface.
+Phase 4 chat-first Expo app for the Lexar AI demo. The app is intentionally dependency-light and uses React Native primitives for the interface.
 
 ## Run
 

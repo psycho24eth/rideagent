@@ -1,4 +1,4 @@
-# RideAgent Design Specification
+# Lexar AI Design Specification
 
 **Date:** 2026-10-17
 **Status:** Approved design; chat-first revision approved
@@ -7,7 +7,7 @@
 
 ## 1. User-visible outcome
 
-A user can open RideAgent and talk to it like a personal assistant. The user can state a goal such as “I need to get to the airport by 10:30,” and RideAgent researches the pickup, destination, timing, available providers, and the user's saved rules. It explains the recommendation and asks “Want me to proceed with the cab booking?” by default. After confirmation, it books the selected option, posts progress updates in the conversation, tracks the ride, handles routine failures, and exposes live controls. An explicit optional Rules setting can enable auto-booking within the user's rules. The system must never claim that a deep-link fallback is booked until the user completes the required provider handoff.
+A user can open Lexar AI and talk to it like a personal assistant. The user can state a goal such as “I need to get to the airport by 10:30,” and Lexar AI researches the pickup, destination, timing, available providers, and the user's saved rules. It explains the recommendation and asks “Want me to proceed with the cab booking?” by default. After confirmation, it books the selected option, posts progress updates in the conversation, tracks the ride, handles routine failures, and exposes live controls. An explicit optional Rules setting can enable auto-booking within the user's rules. The system must never claim that a deep-link fallback is booked until the user completes the required provider handoff.
 
 The first market-specific provider is an ONDC/Beckn mobility adapter for the sandbox/staging environment. Uber, Ola, Rapido, and Bolt are represented initially through a safe deep-link fallback interface rather than undocumented automation.
 

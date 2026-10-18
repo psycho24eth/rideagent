@@ -68,7 +68,7 @@ export const INITIAL_MESSAGES: ChatMessage[] = [
 
 export const INITIAL_ACTIVITY: ActivityItem[] = [
   { id: "activity-rules", kind: "decision", label: "Rules loaded", detail: "Ask before booking · ₹25 ride cap", time: "Today, 8:12 AM", tone: "success" },
-  { id: "activity-ready", kind: "tool", label: "RideAgent ready", detail: "Waiting for your next destination", time: "Today, 8:12 AM", tone: "muted" },
+  { id: "activity-ready", kind: "tool", label: "Lexar AI ready", detail: "Waiting for your next destination", time: "Today, 8:12 AM", tone: "muted" },
 ];
 
 const routeBlock = (): AssistantBlock => ({

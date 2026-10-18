@@ -57,7 +57,7 @@ export const api = {
   getRide: (id: string) => request<Ride>(`/v1/rides/${encodeURIComponent(id)}`),
   getLive: (id: string) => request<LiveRideResponse>(`/v1/rides/${encodeURIComponent(id)}/live`),
   track: (id: string) => request<{ assistantMessage?: string; blocks?: AssistantBlock[]; ride: Ride }>(`/v1/rides/${encodeURIComponent(id)}/track`),
-  cancelRide: (id: string, reason = "Cancelled from the RideAgent desktop preview") =>
+  cancelRide: (id: string, reason = "Cancelled from the Lexar AI desktop preview") =>
     request<{ ride: Ride }>(`/v1/rides/${encodeURIComponent(id)}/cancel`, {
       method: "POST",
       body: JSON.stringify({ reason }),

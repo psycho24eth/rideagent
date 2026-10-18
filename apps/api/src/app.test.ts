@@ -40,7 +40,7 @@ async function requestRide(app: BuiltApp, message = "I need a ride to the airpor
   return app.inject({ method: "POST", url: "/v1/chat", payload: { message, pickup: { label: "Home" } } });
 }
 
-describe("RideAgent Step 2 API", () => {
+describe("Lexar AI Step 2 API", () => {
   let provider: CountingProvider;
   let app: BuiltApp;
 

@@ -1,6 +1,6 @@
 # Add a country or provider adapter
 
-RideAgent providers implement the shared `RideProvider` contract in `packages/providers/src/types.ts`. A provider is a capability boundary, not a place for planner logic or payment automation. Keep the planner and mobile flow country-neutral.
+Lexar AI providers implement the shared `RideProvider` contract in `packages/providers/src/types.ts`. A provider is a capability boundary, not a place for planner logic or payment automation. Keep the planner and mobile flow country-neutral.
 
 ## 1. Define the adapter and configuration
 
@@ -59,7 +59,7 @@ For a provider that cannot complete booking through an approved API:
 
 For ONDC/Beckn-style adapters, record the operation and validate the callback context:
 
-- Keep the operation (`search`, `select`, `init`, `confirm`, `status`, `track`, or `cancel`) tied to the RideAgent user, ride/quote when known, and provider id.
+- Keep the operation (`search`, `select`, `init`, `confirm`, `status`, `track`, or `cancel`) tied to the Lexar AI user, ride/quote when known, and provider id.
 - Generate and persist the `transaction_id` and request `message_id`; record response/callback ids when returned.
 - Reject a callback whose transaction or message correlation does not match the request.
 - Store redacted request/response snapshots and metadata only. Never store bearer tokens, signing secrets, or payment data in snapshots or logs.

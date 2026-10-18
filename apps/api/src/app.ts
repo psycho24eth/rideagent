@@ -91,7 +91,7 @@ async function enqueueTracking(queue: TrackingJobQueue | undefined, store: RideR
   } catch (error) {
     // The booking has already been committed locally. A queue outage must not
     // turn a successful provider booking into a false booking failure response.
-    console.error("RideAgent could not enqueue tracking job", error);
+    console.error("Lexar AI could not enqueue tracking job", error);
   }
 }
 
