@@ -1,0 +1,296 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  rider
+  driver
+  operator
+}
+
+enum UserStatus {
+  active
+  suspended
+  deactivated
+}
+
+enum BookingMode {
+  ask_before_booking
+  auto_book_within_rules
+}
+
+enum RidePreference {
+  cost
+  speed
+  balanced
+}
+
+enum RideStatus {
+  requested
+  quoted
+  booked
+  driver_assigned
+  arriving
+  arrived
+  in_trip
+  completed
+  cancelled
+  failed
+}
+
+enum VehicleType {
+  bike
+  auto
+  cab
+}
+
+enum ActorRole {
+  rider
+  driver
+  operator
+  system
+}
+
+enum RideEventKind {
+  status_changed
+  agent_decision
+  agent_tool_call
+  provider_update
+  human_action_required
+  trusted_contact_shared
+  notification_sent
+}
+
+enum ToolCallOutcome {
+  accepted
+  rejected
+}
+
+enum ProviderOperationKind {
+  search
+  select
+  init
+  confirm
+  status
+  track
+  cancel
+  deep_link
+}
+
+enum ProviderOperationStatus {
+  pending
+  sent
+  acknowledged
+  completed
+  failed
+  timed_out
+  human_action_required
+}
+
+model User {
+  // The API currently uses a stable demo/user identifier such as "demo-user".
+  id                  String                @id
+  role                UserRole              @default(rider)
+  status              UserStatus            @default(active)
+  displayName         String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  rules               UserRules?
+  rides               Ride[]                @relation("RiderRides")
+  rideEvents          RideEvent[]
+  agentDecisions      AgentDecision[]
+  toolCallLogs        ToolCallLog[]
+  trustedContacts     TrustedContact[]
+  providerOperations  ProviderOperation[]
+
+  @@index([status, createdAt])
+}
+
+model UserRules {
+  id                    String        @id @default(cuid())
+  userId                String        @unique
+  perRideCapMinor       Int
+  dailySpendCapMinor    Int
+  preferredProviders    String[]      @default([])
+  preferredVehicleType  VehicleType?
+  preference            RidePreference @default(balanced)
+  bookingMode           BookingMode   @default(ask_before_booking)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Ride {
+  id                  String            @id
+  riderId             String
+  pickup              Json
+  dropoff             Json
+  vehicleType         VehicleType
+  status              RideStatus        @default(requested)
+  version             Int               @default(0)
+  providerRideId      String?
+  driverId            String?
+  vehicleId           String?
+  otp                 String?
+  etaSeconds          Int?
+  selectedQuoteId     String?
+  quoteSnapshot       Json?
+  providerSnapshot    Json?
+  metadata            Json?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  rider               User              @relation("RiderRides", fields: [riderId], references: [id], onDelete: Cascade)
+  selectedQuote       RideQuote?        @relation("SelectedQuote", fields: [selectedQuoteId], references: [id], onDelete: SetNull)
+  quotes              RideQuote[]       @relation("RideQuotes")
+  events              RideEvent[]
+  agentDecisions      AgentDecision[]
+  toolCallLogs        ToolCallLog[]
+  providerOperations  ProviderOperation[]
+
+  @@index([riderId, createdAt])
+  @@index([riderId, status, updatedAt])
+  @@index([providerRideId])
+}
+
+model RideQuote {
+  id                    String              @id
+  rideRequestId         String
+  providerId            String
+  vehicleType           VehicleType
+  amountMinor           Int
+  currency              String              @db.Char(3)
+  estimatedDistanceMeters Int
+  estimatedDurationSeconds Int
+  expiresAt             DateTime
+  deepLink              String?             @db.Text
+  humanActionRequired   Boolean             @default(false)
+  providerSnapshot      Json?
+  metadata              Json?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  ride                  Ride                @relation("RideQuotes", fields: [rideRequestId], references: [id], onDelete: Cascade)
+  selectedForRides      Ride[]              @relation("SelectedQuote")
+  providerOperations    ProviderOperation[]
+
+  @@index([rideRequestId, createdAt])
+  @@index([providerId, expiresAt])
+}
+
+model RideEvent {
+  id                    String                 @id @default(cuid())
+  rideId               String
+  userId               String
+  kind                 RideEventKind
+  fromStatus           RideStatus?
+  toStatus             RideStatus?
+  previousVersion      Int?
+  nextVersion          Int?
+  actorId              String?
+  actorRole            ActorRole?
+  reason               String?
+  payload              Json?
+  providerOperationId  String?
+  occurredAt           DateTime               @default(now())
+  createdAt            DateTime               @default(now())
+  ride                 Ride                   @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerOperation    ProviderOperation?     @relation("ProviderOperationEvents", fields: [providerOperationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([rideId, occurredAt])
+  @@index([rideId, kind, occurredAt])
+}
+
+model AgentDecision {
+  id          String   @id @default(cuid())
+  userId      String
+  rideId      String?
+  decision    String
+  reason      String
+  metadata    Json?
+  occurredAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride        Ride?    @relation(fields: [rideId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([rideId, occurredAt])
+}
+
+model ToolCallLog {
+  id          String           @id @default(cuid())
+  userId      String
+  rideId      String?
+  tool        String
+  arguments   Json
+  outcome     ToolCallOutcome
+  result      Json?
+  errorCode   String?
+  metadata    Json?
+  occurredAt  DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride        Ride?            @relation(fields: [rideId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([rideId, occurredAt])
+  @@index([tool, occurredAt])
+}
+
+model TrustedContact {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  phoneE164   String?
+  email       String?
+  relationship String?
+  isEnabled   Boolean  @default(true)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isEnabled])
+}
+
+model ProviderOperation {
+  id                 String                   @id @default(cuid())
+  userId             String
+  rideId             String?
+  quoteId            String?
+  providerId         String
+  operation          ProviderOperationKind
+  status             ProviderOperationStatus  @default(pending)
+  correlationId      String
+  transactionId      String?
+  requestMessageId   String?
+  responseMessageId  String?
+  callbackMessageId  String?
+  requestSnapshot    Json?
+  responseSnapshot   Json?
+  metadata           Json?
+  errorCode          String?
+  errorMessage       String?
+  startedAt          DateTime                 @default(now())
+  callbackReceivedAt DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  user               User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride               Ride?                    @relation(fields: [rideId], references: [id], onDelete: SetNull)
+  quote              RideQuote?              @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  events             RideEvent[]              @relation("ProviderOperationEvents")
+
+  @@unique([providerId, operation, correlationId])
+  @@index([userId, createdAt])
+  @@index([rideId, createdAt])
+  @@index([quoteId, createdAt])
+  @@index([providerId, transactionId])
+  @@index([providerId, requestMessageId])
+  @@index([providerId, callbackMessageId])
+}

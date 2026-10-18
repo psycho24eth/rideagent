@@ -1,0 +1,81 @@
+services:
+  api:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: ["sh", "-c", "npm ci && npm run start --workspace=@rideagent/api"]
+    environment:
+      PORT: "${PORT:-3000}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-rideagent}:${POSTGRES_PASSWORD:-rideagent_local}@postgres:5432/${POSTGRES_DB:-rideagent}?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      EXPO_PUBLIC_API_BASE_URL: "${EXPO_PUBLIC_API_BASE_URL:-http://localhost:3000}"
+      DEMO_MODE: "${DEMO_MODE:-true}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      ANTHROPIC_MODEL: "${ANTHROPIC_MODEL:-claude-3-5-haiku-latest}"
+      BECKN_SANDBOX_URL: "${BECKN_SANDBOX_URL:-}"
+      BECKN_SUBSCRIBER_ID: "${BECKN_SUBSCRIBER_ID:-}"
+      BECKN_SUBSCRIBER_URI: "${BECKN_SUBSCRIBER_URI:-}"
+      BECKN_COUNTRY: "${BECKN_COUNTRY:-IND}"
+      BECKN_CITY: "${BECKN_CITY:-std:011}"
+      BECKN_DOMAIN: "${BECKN_DOMAIN:-ONDC:TRV11}"
+      BECKN_CORE_VERSION: "${BECKN_CORE_VERSION:-1.2.0}"
+      ONDC_SANDBOX_URL: "${ONDC_SANDBOX_URL:-}"
+      ONDC_SUBSCRIBER_ID: "${ONDC_SUBSCRIBER_ID:-}"
+      ONDC_SUBSCRIBER_URI: "${ONDC_SUBSCRIBER_URI:-}"
+      ONDC_COUNTRY: "${ONDC_COUNTRY:-IND}"
+      ONDC_CITY: "${ONDC_CITY:-std:011}"
+      ONDC_DOMAIN: "${ONDC_DOMAIN:-ONDC:TRV11}"
+      ONDC_CORE_VERSION: "${ONDC_CORE_VERSION:-1.2.0}"
+    volumes:
+      - ./:/workspace
+      - rideagent_node_modules:/workspace/node_modules
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:' + (process.env.PORT || '3000') + '/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-rideagent}"
+      POSTGRES_USER: "${POSTGRES_USER:-rideagent}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-rideagent_local}"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - rideagent_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - rideagent_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  rideagent_node_modules:
+  rideagent_postgres_data:
+  rideagent_redis_data:

@@ -1,0 +1,28 @@
+{
+  "name": "@rideagent/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/start.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "worker": "tsx src/worker.ts"
+  },
+  "dependencies": {
+    "@rideagent/providers": "file:../../packages/providers",
+    "@rideagent/shared": "file:../../packages/shared",
+    "@prisma/client": "^6.19.0",
+    "bullmq": "^5.58.5",
+    "fastify": "^5.2.1",
+    "ioredis": "^5.7.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prisma": "^6.19.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.9"
+  }
+}

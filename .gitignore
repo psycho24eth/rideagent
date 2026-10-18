@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.expo/
+.omnirush/
+.opencode/
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+*.tsbuildinfo

@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "RideAgent",
+    "slug": "rideagent",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#171614"
+    },
+    "assetBundlePatterns": ["**/*"]
+  }
+}
